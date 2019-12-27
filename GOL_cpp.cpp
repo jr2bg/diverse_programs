@@ -1,20 +1,4 @@
 #include <stdio.h>
-// Lattice generation
-// void lattice_generator(int ** lattice, int n_rows, int n_cols){
-//   // lattice = new int *[n_rows];
-//   // for (int i = 0; i < n_rows; i++){
-//   //   lattice[i] = new int[n_cols];
-//   // }
-//
-//   for (int i = 0; i < n_rows; i++){
-//     for (int j = 0; j < n_cols; j++) {
-//       //lattice[i][j] = 0;
-//       *(*(lattice +i) + j) = 0;
-//     }
-//   }
-//   printf("Lattice value:  %d\n", lattice[0][1]);
-// }
-
 // take neighbourhood from the lattice
 // lattice -> lattice
 // neighbourhood -> neighbourhood
@@ -33,9 +17,6 @@ int neigh_array(int **lattice,int neighbourhood[3][3], int row_p, int col_p, int
       if (n_r >= n_rows) n_r = n_rows - n_r;  // - por que debemos ir hacia el principio
       if (n_c >= n_cols) n_c = n_cols - n_c;
       neighbourhood[i][j] = lattice[n_r][n_c];
-
-      //printf("N NEIGH row %d  col %d:  %d\n",i ,j, neighbourhood[i][j]);
-      //printf("LATTICE row %d  col %d:  %d\n\n",n_r ,n_c, lattice[n_r][n_c]);
     }
   }
 }
@@ -101,7 +82,6 @@ int main() {
   int i, j;
 
   // inicializando la lattice y la vecindad
-  //int lattice[n_rows][n_cols], neighbourhood[3][3] = {};
   int **lattice = NULL, **n_lattice = NULL, neighbourhood[3][3] = {};
 
   // Generación de la lattice
@@ -134,7 +114,6 @@ int main() {
     evolution(lattice, neighbourhood, n_rows, n_cols, n_lattice);
 
   }
-  //printf(" LATTICE 0 3   %d\n", lattice[0][3]);
   delete lattice;
   delete n_lattice;
   return 0;

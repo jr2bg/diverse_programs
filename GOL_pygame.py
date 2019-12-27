@@ -82,9 +82,9 @@ height = 30#num_cuadros altura
 width = 30 #num_cuadros ancho
 
 config = np.zeros((height + 2, width + 2))
-# print(config)
+
 dic_states = {0: white, 1: black}
-# print(dic_states[config[0,1]])
+
 
 ## VISUALIZACIÓN
 pygame.init()
@@ -106,7 +106,7 @@ while setup:
             print("a mouse BUTTON PRESSED!!!  :3")
             print(event.pos, event.pos[0] // (tamCuadro + 1))
             config[event.pos[1] // (tamCuadro + 1) + 1 , event.pos[0] // (tamCuadro + 1) + 1] = 1
-            #gameOver = True
+
         elif event.type == pygame.QUIT:
             setup = False
     screen.fill(gray)
@@ -117,9 +117,7 @@ while setup:
         for j in range(1, size[1], tamCuadro + 1): # height
             pygame.draw.rect(screen, dic_states[config[ht,wh]], [i, j, tamCuadro, tamCuadro], 0)
             ht += 1
-            #print(ht)
         wh += 1
-        #print("asdfasf      ", wh)
     pygame.display.flip()
     clock.tick(1)
 
@@ -135,9 +133,7 @@ while not gameOver:
         for j in range(1, size[1], tamCuadro + 1): # height
             pygame.draw.rect(screen, dic_states[config[ht,wh]], [i, j, tamCuadro, tamCuadro], 0)
             ht += 1
-            #print(ht)
         wh += 1
-        #print("asdfasf      ", wh)
     pygame.display.flip()
     clock.tick(1)
 pygame.quit()

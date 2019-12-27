@@ -6,11 +6,7 @@ g++ julia_set.cpp -w -lSDL2 -lSDL2_image -o julia
 
 #include <SDL2/SDL.h>
 #include <stdio.h>
-//#define _USE_MATH_DEFINES
 #include <math.h>
-// #ifndef M_PI
-// #define M_PI (3.14159265358979323846)
-// #endif
 
 
 struct ComplexNumb {
@@ -52,12 +48,10 @@ int it_number(ComplexNumb z_n, ComplexNumb c, int n_rows, int n_cols, int i, int
   int k = 0;
   float c_mod;
   z_n = init_z_n(z_n, n_rows , n_cols, i , j);
-  //printf("real   %f     img   %f\n", z_n.real, z_n.img);
   c_mod = complexMod(z_n);
   while ( c_mod < R * R && k < 255) {
     z_n = Julia_set_it(z_n, c);
     c_mod = complexMod(z_n);
-    //printf("it %i:\treal %f\timaginaria %f\tmod %f\n", k, z_n.real, z_n.img, c_mod);
     k++;
   }
   return k;
@@ -100,10 +94,8 @@ int main(int argc, char const *argv[]) {
   SDL_Surface * surface = nullptr;
 
 
-  //void * pixels;
   uint8_t * pixels;
   int pitch, p_color;
-  //Uint32 RGBmask;
 
   if (SDL_Init(SDL_INIT_VIDEO < 0)) {
     printf("VIDEO NOT INITIALIZED:    %s\n", SDL_GetError());
@@ -188,7 +180,7 @@ int main(int argc, char const *argv[]) {
       for (int x = 0; x < n_cols; x++) {
         // color
         p_color = space[y][x];
-        // colores chidoris (0-7 azul) (8-15 verde) (16-23 rojo)
+        // colores (0-7 azul) (8-15 verde) (16-23 rojo)
         *p = p_color<<2  | p_color << 11 | p_color <<21;
         p++;
       }

@@ -1,6 +1,3 @@
-/*This source code copyrighted by Lazy Foo' Productions (2004-2019)
-and may not be redistributed without written permission.*/
-
 // g++ GOL_sdl.cpp -w -lSDL2 -lSDL2_image -o GOL
 
 //Using SDL, SDL_image, standard IO, math, and strings
