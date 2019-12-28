@@ -44,7 +44,7 @@ def fitness_ratio(l_fitness):
 
     return l_fit_ratio
 
-
+# probabilidad acumulada
 def accum_fit_ratio(l_fit_ratio):
     l_a_fit_ratio = []
     for i in range(len(l_fit_ratio)):
@@ -54,34 +54,33 @@ def accum_fit_ratio(l_fit_ratio):
             l_a_fit_ratio.append(l_fit_ratio[i] + l_a_fit_ratio[i-1])
     return l_a_fit_ratio
 
-
-def roulette_wheel_selection(l_a_fit_ratio):
+# función de selección de los padres
+def roulette_wheel_selection(l_fit_ratio):
+    l_a_fit_ratio = accum_fit_ratio(l_fit_ratio)
     # different parents
     f_trial = random()
     s_trial = random()
     f_parent = 0
     s_parent = 0
-    in_search = True
+    s_list = l_fit_ratio.copy() # copia para el segundo padre
 
     for i in range(len(l_a_fit_ratio)):
+        # probabilidad acumulada es mayor al número encontrado
         if l_a_fit_ratio[i] >= f_trial:
             f_parent = i
+            prob_i = s_list.pop(i)
+            #print("probabilidad de primer padre", prob_i)
             break
-
-    while in_search:
-        for i in range(len(l_a_fit_ratio)):
-            if l_a_fit_ratio[i] >= s_trial:
-                if i != f_parent:
-                    s_parent = i
-                    in_search = False
-                    break
-                else:
-                    s_trial = random()
-                    break
+    l_a_fit_ratio = accum_fit_ratio(s_list)
+    # ciclo que encuentra otro padre diferente al primero pseudo aleatoriamente
+    for i in range(len(l_a_fit_ratio)):
+        if l_a_fit_ratio[i] >= (s_trial)/(1 - prob_i):
+            s_parent = i
+            break
 
     return f_parent, s_parent
 
-
+# función de crossover
 def crossover_operator(s_parents, len_code, crossover_prob = 0.7):
     # NO intercambio de cromosomas
     if random() > crossover_prob:
@@ -97,13 +96,14 @@ def crossover_operator(s_parents, len_code, crossover_prob = 0.7):
         return f_children, s_children
 
 
-
+# mutación de los genes
 def mutation_operator(child, len_code, mutation_prob = 0.001):
     if random() <= mutation_prob:
         l_child = list(child)
         for i in range(len_code):
+            # si llega a haber mutación
             if random() <= mutation_prob:
-
+                # intercambia los valores
                 if l_child[i] == "0":
                     l_child[i] = "1"
                 else:
@@ -112,12 +112,15 @@ def mutation_operator(child, len_code, mutation_prob = 0.001):
         child = "".join(l_child)
     return child
 
-
-def f_new_pop(start_pop, l_a_fit_ratio, n_pop ,len_code,
+# función que retorna la nueva población
+# probabilidades de crossover y de mutación se mantienen como las sugeridas
+def f_new_pop(start_pop, l_fit_ratio, n_pop ,len_code,
             crossover_prob = 0.7, mutation_prob = 0.001 ):
     new_pop = []
+    # hasta que la nueva población tenga los mismos habitantes que la inicial
     while len(new_pop) < n_pop:
-        parents = roulette_wheel_selection(l_a_fit_ratio)
+        # selección de los padres
+        parents = roulette_wheel_selection(l_fit_ratio)
         s_parents = (start_pop[parents[0]], start_pop[parents[1]])
         # non-mutated children
         children = crossover_operator(s_parents, len_code, crossover_prob)
@@ -126,45 +129,45 @@ def f_new_pop(start_pop, l_a_fit_ratio, n_pop ,len_code,
         m_child_0 = mutation_operator(children[0], len_code, mutation_prob)
         m_child_1 = mutation_operator(children[1], len_code, mutation_prob)
 
+        # anexo a la nueva población
         new_pop.append(m_child_0)
         new_pop.append(m_child_1)
 
     return new_pop
 
+# función que determina si se cumple o no la condición de terminación
+def termination_criterion(population):
+    # la diferencia entre los números mayor y menor sea menor o igual a 5
+    if abs(max(population)-min(population)) <= 2:
+        return True
+    else:
+        return False
+
+
 if __name__ == "__main__":
 
     len_code = 4
     n_pop = 6
+    is_termination = False
     # población aleatoria
     start_pop = start_population(n_pop, len_code)
 
-    # fitness de cada individuo
-    l_fitness = chromo_fitness(start_pop)
 
-    #fitness ratio
-    l_fit_ratio = fitness_ratio(l_fitness)
+    while not is_termination:
+        print(start_pop)
 
-    #accumulated fittnes ratio
-    l_a_fit_ratio = accum_fit_ratio(l_fit_ratio)
+        # fitness de cada individuo
+        l_fitness = chromo_fitness(start_pop)
+        print(l_fitness)
 
-    # parents
-    parents = roulette_wheel_selection(l_a_fit_ratio)
-    s_parents = (start_pop[parents[0]], start_pop[parents[1]])
+        #fitness ratio
+        l_fit_ratio = fitness_ratio(l_fitness)
 
-    # non-mutated children
-    children = crossover_operator(s_parents, len_code)
+        # nueva población
+        start_pop = f_new_pop(start_pop, l_fit_ratio, n_pop ,len_code)
 
-    # mutated-children
-    m_children_0 = mutation_operator(children[0], len_code)
-    m_children_1 = mutation_operator(children[1], len_code)
+        # condición de terminación
+        is_termination = termination_criterion(l_fitness)
 
-    print(start_pop)
-    print(l_fitness)
-    print(l_fit_ratio)
-    print(l_a_fit_ratio)
-    #print(parents)
-    print(s_parents)
-    #print(children)
-    print(m_children_0, m_children_1)
-    new_pop = f_new_pop(start_pop, l_a_fit_ratio, n_pop ,len_code)
-    print(new_pop)
+    # población final después de la condición de terminación
+    print("POBLACIÓN FINAL --- ", start_pop)
