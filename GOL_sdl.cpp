@@ -20,7 +20,7 @@ bool loadMedia();
 void close();
 
 //Loads individual image as texture
-SDL_Texture* loadTexture( std::string path );
+//SDL_Texture* loadTexture( std::string path );
 
 //The window we'll be rendering to
 SDL_Window* gWindow = NULL;
@@ -104,36 +104,6 @@ void close()
 	SDL_Quit();
 }
 
-SDL_Texture* loadTexture( std::string path )
-{
-	//The final texture
-	SDL_Texture* newTexture = NULL;
-
-	//Load image at specified path
-	SDL_Surface* loadedSurface = IMG_Load( path.c_str() );
-	if( loadedSurface == NULL )
-	{
-		printf( "Unable to load image %s! SDL_image Error: %s\n", path.c_str(), IMG_GetError() );
-	}
-	else
-	{
-		//Create texture from surface pixels
-        newTexture = SDL_CreateTextureFromSurface( gRenderer, loadedSurface );
-		if( newTexture == NULL )
-		{
-			printf( "Unable to create texture from %s! SDL Error: %s\n", path.c_str(), SDL_GetError() );
-		}
-
-		//Get rid of old loaded surface
-		SDL_FreeSurface( loadedSurface );
-	}
-
-	return newTexture;
-}
-
-
-
-
 
 int main( int argc, char* args[] )
 { // pp_side -> pixels per side
@@ -174,114 +144,130 @@ int main( int argc, char* args[] )
   // Término de la creación de la lattice
 
 
+	// inicializando los gráficos
+	SDL_Window  * window = nullptr;
+  SDL_Renderer * renderer = nullptr;
+  SDL_Texture * texture = nullptr;
+  SDL_Surface * surface = nullptr;
+
 	//Start up SDL and create window
-	if( !init(SCREEN_WIDTH, SCREEN_HEIGHT) )
-	{
-		printf( "Failed to initialize!\n" );
+	if (SDL_Init(SDL_INIT_VIDEO < 0)){
+		printf("VIDEO NOT INITIALIZED:\t%s\n", SDL_GetError());
+		return -1;
 	}
-	else
+
+	window = SDL_CreateWindow("GOL",
+														SDL_WINDOWPOS_UNDEFINED,
+														SDL_WINDOWPOS_UNDEFINED,
+														SCREEN_WIDTH,
+														SCREEN_HEIGHT,
+														SDL_WINDOW_SHOWN);
+
+	if (window == nullptr) {
+		printf("WINDOW NOT CREATED:    %s\n", SDL_GetError());
+    SDL_Quit();
+    return -1;
+	}
+
+	renderer = SDL_CreateRenderer( window, -1,
+								SDL_RENDERER_ACCELERATED);
+
+	if (renderer == nullptr){
+	SDL_DestroyWindow(window);
+  printf("RENDERER NOT CREATED:    %s\n", SDL_GetError());
+	SDL_Quit();
+	return -1;
+  }
+
+
+	SDL_SetRenderDrawColor( renderer, 165, 165, 165, 255 );
+
+	bool quit = false;
+
+	SDL_Event e;
+
+	while(!quit)
 	{
-		//Load media
-		if( !loadMedia() )
+		while ( SDL_PollEvent(&e) !=0 )
 		{
-			printf( "Failed to load media!\n" );
-		}
-		else
-		{
-			//Main loop flag
-			bool quit = false;
-
-			//Event handler
-			SDL_Event e;
-
-			//While application is running
-			while( !quit )
+			if (e.type == SDL_QUIT)
 			{
-				//Handle events on queue
-				while( SDL_PollEvent( &e ) != 0 )
-				{
-					//User requests quit
-					if( e.type == SDL_QUIT )
-					{
-						quit = true;
+				quit = true;
+			}
+
+			if (is_init){
+
+				if (e.type == SDL_KEYDOWN) {
+					switch (e.key.keysym.sym) {
+						case SDLK_RETURN: // enter presionado
+						is_init = false;
 					}
-
-					if (is_init){
-
-						if (e.type == SDL_KEYDOWN) {
-							switch (e.key.keysym.sym) {
-								case SDLK_RETURN: // enter presionado
-								is_init = false;
-							}
-						}
-
-						// selección de los cuadros negros
-						else if (e.type == SDL_MOUSEBUTTONDOWN){
-							if (e.button.button == SDL_BUTTON_LEFT){
-								printf("--- LEFT PUSHED---\n");
-								r = e.button.y/ (pp_side + pp_line);
-								c = e.button.x/ (pp_side + pp_line);
-								printf("x ->  %d; y -> %d\n", e.button.x, e.button.y);
-								printf("c ->  %d; r -> %d\n",r,c);
-
-								// célula viva
-								lattice[r][c] = 1;
-							}
-						}
-					}
-
 				}
 
-				//Clear screen; gray background
-				SDL_SetRenderDrawColor( gRenderer, 165, 165, 165, 255 );
-				SDL_RenderClear( gRenderer );
+				// selección de los cuadros negros
+				else if (e.type == SDL_MOUSEBUTTONDOWN){
+					if (e.button.button == SDL_BUTTON_LEFT){
+						printf("--- LEFT PUSHED---\n");
+						r = e.button.y/ (pp_side + pp_line);
+						c = e.button.x/ (pp_side + pp_line);
+						printf("x ->  %d; y -> %d\n", e.button.x, e.button.y);
+						printf("c ->  %d; r -> %d\n",r,c);
 
-				//Render white filled quad
-				SDL_SetRenderDrawColor( gRenderer, 255, 255, 255, 255 );
-
-				// creación de las posiciones de los cuadros
-        for (r = 0; r < n_rows; r++){
-          for (c = 0; c < n_cols ; c++){
-						// para células vivas
-						if (lattice[r][c] == 1){
-							live_cells.push_back({c*(pp_side +pp_line),r * (pp_side +pp_line), pp_side, pp_side});
-						}
-						// para células muertas
-						else {
-          		death_cells.push_back({c*(pp_side +pp_line),r * (pp_side +pp_line), pp_side, pp_side});
-						}
-          }
-        }
-				// renderización
-        for (auto const &w : death_cells) {
-          SDL_RenderFillRect( gRenderer, &w);
-        }
-
-				//Render black filled quad
-				SDL_SetRenderDrawColor( gRenderer,0, 0, 0, 255 );
-				for (auto const &w : live_cells) {
-          SDL_RenderFillRect( gRenderer, &w);
-        }
-
-				//Update screen
-				SDL_RenderPresent( gRenderer );
-        // delay de 200 milisegundos
-        SDL_Delay(100);
-				// free memory de los vectores con las células vivas y muertas
-				death_cells.clear();
-				live_cells.clear();
-
-				// mientras corresponda a la parte de GOL
-				if (!is_init){
-					printf("****--------- EVOLUCION :v  ------------*****\n" );
-			    evolution(lattice, neighbourhood, n_rows, n_cols, n_lattice);
+						// célula viva
+						lattice[r][c] = 1;
+					}
 				}
 			}
 		}
-	}
 
+		//Clear screen; gray background
+		SDL_SetRenderDrawColor( renderer, 165, 165, 165, 255 );
+		SDL_RenderClear( renderer );
+
+		//Render white filled quad
+		SDL_SetRenderDrawColor( renderer, 255, 255, 255, 255 );
+
+		// creación de las posiciones de los cuadros
+		for (r = 0; r < n_rows; r++){
+			for (c = 0; c < n_cols ; c++){
+				// para células vivas
+				if (lattice[r][c] == 1){
+					live_cells.push_back({c*(pp_side +pp_line),r * (pp_side +pp_line), pp_side, pp_side});
+				}
+				// para células muertas
+				else {
+					death_cells.push_back({c*(pp_side +pp_line),r * (pp_side +pp_line), pp_side, pp_side});
+				}
+			}
+		}
+		// renderización
+		for (auto const &w : death_cells) {
+			SDL_RenderFillRect( renderer, &w);
+		}
+
+		//Render black filled quad
+		SDL_SetRenderDrawColor( renderer,0, 0, 0, 255 );
+		for (auto const &w : live_cells) {
+			SDL_RenderFillRect( renderer, &w);
+		}
+
+		//Update screen
+		SDL_RenderPresent( renderer );
+		// delay de 100 milisegundos
+		SDL_Delay(100);
+		// free memory de los vectores con las células vivas y muertas
+		death_cells.clear();
+		live_cells.clear();
+
+		// mientras corresponda a la parte de GOL
+		if (!is_init){
+			printf("****--------- EVOLUCION :v  ------------*****\n" );
+			evolution(lattice, neighbourhood, n_rows, n_cols, n_lattice);
+		}
+	}
 	//Free resources and close SDL
 	close();
 
 	return 0;
+
 }
