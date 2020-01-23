@@ -84,6 +84,11 @@ int main(int argc, char const *argv[]) {
       {
         quit = true;
       }
+
+      else if (event.button.button == SDL_BUTTON_LEFT)
+      {
+        printf("%d\n", event.button.x);
+      }
     }
 
     SDL_LockTexture(texture, nullptr, (void **)&pixels, &pitch);

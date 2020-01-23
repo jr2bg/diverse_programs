@@ -205,17 +205,15 @@ int main( int argc, char* args[] )
 				}
 
 				// selección de los cuadros negros
-				else if (e.type == SDL_MOUSEBUTTONDOWN){
-					if (e.button.button == SDL_BUTTON_LEFT){
-						printf("--- LEFT PUSHED---\n");
-						r = e.button.y/ (pp_side + pp_line);
-						c = e.button.x/ (pp_side + pp_line);
-						printf("x ->  %d; y -> %d\n", e.button.x, e.button.y);
-						printf("c ->  %d; r -> %d\n",r,c);
+				else if (e.button.button == SDL_BUTTON_LEFT){
+					printf("--- LEFT PUSHED---\n");
+					r = e.button.y/ (pp_side + pp_line);
+					c = e.button.x/ (pp_side + pp_line);
+					printf("x ->  %d; y -> %d\n", e.button.x, e.button.y);
+					printf("c ->  %d; r -> %d\n",r,c);
 
-						// célula viva
-						lattice[r][c] = 1;
-					}
+					// célula viva
+					lattice[r][c] = 1;
 				}
 			}
 		}
