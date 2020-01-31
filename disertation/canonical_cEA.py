@@ -6,12 +6,16 @@ class cea:
         self.dimensions = (n_rows,n_cols)
         self.grid = np.zeros([n_rows,n_cols])
 
-    def neigh(neighbourhood):
-        ''' método para asignar una vecindad como la usar'''
-        self.neighbourhood = neighbourhood
+    def neigh(self,cell_pos):
+        ''' método para extraer el grid con los estados del CA'''
+        neigh_rows = [cell_pos[0] - 1, cell_pos[0] , cell_pos[0] + 1] % self.dimensions[0]
+        neigh_cols = [cell_pos[1] - 1, cell_pos[1] , cell_pos[1] + 1] % self.dimensions[1]
 
-    def rules(cell):
-        neighbours = 
+        return self.grid(np.ix_(neigh_rows, neigh_cols))
+
+    def rules(grid_neigh):
+        
+        neighbours =
 
     def evolution():
         ''' regla de evolución, iteración sobre cada elemento del grid'''
