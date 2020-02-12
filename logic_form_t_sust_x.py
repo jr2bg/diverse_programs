@@ -3,11 +3,8 @@
 # Por utilidad, tanto phi como t se tomarán como listas y x como una cadena
 
 def isTerm(t):
-    if isVariable(t):
-        return True
-    elif isConstantSymbol(t):
-        return True
-    elif isNAryFunction(t):
+    ''' solo depende de si la cadena empieza con t para determinar si es término'''
+    if t.startswith("t"):
         return True
     return False
 
@@ -52,4 +49,9 @@ def isSubstitutable(phi, x, t):
     else:
         if len(phi) == 4 and phi[0] == "(" and phi[-1] == ")" and phi[1] == "NEG" and isSubstitutable(phi[2], x, t):
             return True
-        elif :
+        elif len(phi) == 5 and phi[2] == "VEE" and isSubstitutable(phi[1],x,t) and isSubstitutable(phi[3],x,t):
+            return True
+        elif len(phi) == 7 and phi[0]=="(" and phi[-1]==")" and phi[1]== "FORALL" and
+                            isSubstitutable(phi[5],x,t) and (y not in t):
+            return True
+        return False
