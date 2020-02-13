@@ -1,8 +1,12 @@
 # dependencies
 import numpy as np
+import random
 
 def fitness(cell):
-    pass
+    # si solo regresa cell, significa que está trabajando sobre una
+    # función lineal
+
+    return cell
 
 def fitness_ratio(population_fitness):
     ''' función que calcula el cociente del fitness de toda la población'''
@@ -14,7 +18,7 @@ def a_fit_ratio(l_fit_ratio):
     ''' función que regresa el acumulado de la lista con los valores de fitness'''
     # como en programación dinámica
     accum_fit_ratio = [(0,l_fit_ratio[0])]
-
+    # se toma desde el inicio hasta el final, por eso es que es una tupla
     for fit in l_fit_ratio[1:]:
         accum_fit_ratio.append((accum_fit_ratio[-1][1],accum_fit_ratio[-1][1] + fit))
 
@@ -62,32 +66,111 @@ def mutation(child, p_m):
     return child
 
 
-class cea:
-    def __init__(self, n_cols, n_rows):
-        self.dimensions = (n_rows,n_cols)
+class CEA:
+    def __init__(self, n_cols, n_rows, mutation_prob = 0.001):
+        self.n_rows = n_rows
+        self.n_cols = n_cols
         self.grid = np.zeros([n_rows,n_cols])
+        self.p_m = mutation_prob
+
+    def init_population(self):
+        ''' inicializa la teselación con valores enteros entre 0 y 255'''
+        with np.nditer(self.grid, op_flags = ['readwrite']) as it:
+            for cell in it:
+                cell[...] = random.randint(0 , 255)
+        print(self.grid)
 
     def neigh(self,cell_pos):
         ''' método para extraer la vecindad alrededor de una célula del CA'''
-        neigh_rows = [cell_pos[0] - 1, cell_pos[0] , cell_pos[0] + 1] % self.dimensions[0]
-        neigh_cols = [cell_pos[1] - 1, cell_pos[1] , cell_pos[1] + 1] % self.dimensions[1]
+        # creación del toroide
+        neigh_rows = [(cell_pos[0] - 1) % self.n_rows, cell_pos[0]% self.n_rows,
+                    (cell_pos[0] + 1)% self.n_rows]
+        neigh_cols = [(cell_pos[1] - 1)% self.n_cols, cell_pos[1]% self.n_cols,
+                    (cell_pos[1] + 1)% self.n_cols]
 
-        return self.grid(np.ix_(neigh_rows, neigh_cols))
+        nbg_np = self.grid[np.ix_(neigh_rows, neigh_cols)]
+        ngb_l = list(np.concatenate(nbg_np).flat)
+        # lista no anidada
+        return ngb_l
 
-    def parent_selection(cell_neigh):
-        ''' cell_neigh es una vecindad alrededor de una célula'''
-
-    def rules(grid_neigh):
-
-        neighbours =
 
     def evolution(self):
         ''' regla de evolución, iteración sobre cada elemento del grid'''
+        #print("--- NEIGHBORHOODS---")
         with np.nditer(self.grid, op_flags = ['readwrite']) as it:
+            # contador de la iteración sobre el arreglo de numpy
+            i = 0
             for cell in it:
-                cell[...] =
+                l_fitness = [] # lista con el fitness de la vecindad
 
-def interest_function(x):
-    return x**2
+                # posición de la celda con respecto al número de iteraciones
+                # sobre el arreglo del numpy
+                cell_pos = (i// self.n_cols, i%self.n_cols)
 
-# as it is a cellular evolutionary algorithm, there is a grid
+                # numpy solo trabaja con floats, necesario pasarlo a int
+                int_cell = int(cell)
+                # vecindad como un arreglo plano
+                ngbhood = self.neigh(cell_pos)
+
+                for habitant in ngbhood:
+                    l_fitness.append(fitness(habitant))
+                #print(ngbhood)
+
+                # determinación de las probabilidades para seleccionar los padres
+                l_fitness = fitness_ratio(l_fitness)
+                l_fitness = a_fit_ratio(l_fitness)
+
+                # obtención de la posición de los padres
+                pos_parents = parents_selection(l_fitness)
+
+                # identificación de los padres y codeado a binario
+                f_parent = bin(int(ngbhood[pos_parents[0]]))
+                s_parent = bin(int(ngbhood[pos_parents[1]]))
+
+                # remover el "0b" inicial del str
+                f_parent = f_parent[2:]
+                s_parent = s_parent[2:]
+
+                #crossover
+                f_child, s_child = crossover(f_parent, s_parent)
+
+                #mutation
+                f_child = mutation(f_child, self.p_m)
+                s_child = mutation(s_child, self.p_m)
+
+                # reconstruction
+                f_child = int(f_child, 2)
+                s_child = int(s_child, 2)
+
+                # assotiation of the cell with a value
+                if fitness(f_child) > fitness(s_child):
+                    cell[...] = f_child
+                else:
+                    cell[...] = s_child
+
+                # print(l_fitness)
+                # print(pos_parents)
+                # print(f_parent, s_parent)
+                # print(cell)
+                # print("")
+
+                i +=1
+
+
+def main():
+    '''  función principal a ejecutar
+    contiene información acerca de las dimensiones del CA,
+    así como de la condición de paro '''
+    n_cols = 5
+    n_rows = 3
+    cea = CEA(n_cols, n_rows, 0.05)
+    cea.init_population()
+    for i in range(20): # 20 iteraciones
+        cea.evolution()
+    print(cea.grid)
+    print("SUCCESS")
+
+
+
+if __name__ == "__main__":
+    main()
