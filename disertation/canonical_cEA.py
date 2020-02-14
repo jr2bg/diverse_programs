@@ -1,6 +1,8 @@
 # dependencies
 import numpy as np
 import random
+# animation
+import pygame
 
 def fitness(cell):
     # si solo regresa cell, significa que está trabajando sobre una
@@ -161,13 +163,65 @@ def main():
     '''  función principal a ejecutar
     contiene información acerca de las dimensiones del CA,
     así como de la condición de paro '''
-    n_cols = 5
-    n_rows = 3
-    cea = CEA(n_cols, n_rows, 0.05)
+    n_cols = 50
+    n_rows = 40
+    cea = CEA(n_cols, n_rows)
     cea.init_population()
-    for i in range(20): # 20 iteraciones
-        cea.evolution()
-    print(cea.grid)
+
+    # VARIABLE INITIALIZATION FOR PYGAME
+    white = (255, 255, 255)
+    black = ( 0, 0, 0)
+    gray = (165, 165, 165)
+    tamCuadro = 20
+    height = n_rows #num_cuadros altura
+    width = n_cols  #num_cuadros ancho
+
+
+
+
+    # VISUALIZATION
+    pygame.init()
+    pygame.event.pump()
+    mouse_pos = pygame.mouse.get_pos()
+    mouse_buttons = pygame.mouse.get_pressed()
+    size = ((tamCuadro + 1) * width, (tamCuadro + 1) * height)
+    screen = pygame.display.set_mode(size)
+    pygame.display.set_caption("Grid on PYGAME")
+    clock = pygame.time.Clock()
+    FPS = 10    #frames per secont
+    clock.tick(FPS)
+    gameOver = False
+    setup = True
+
+    # condición de paro: 20 iteraciones
+    n_it = 0
+
+    while not gameOver:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                gameOver = True
+        screen.fill(gray)
+        if n_it <= 20:
+            cea.evolution()
+            print(cea.grid)
+        #config = iteration(config, height, width)
+        wh = 0
+        for i in range(1, size[0], tamCuadro + 1):   # width
+            ht = 0
+            for j in range(1, size[1], tamCuadro + 1): # height
+                #// colores (0-7 azul) (8-15 verde) (16-23 rojo)
+                cell_val = int(cea.grid[ht,wh])
+                color = cell_val << 2 | cell_val << 9 | cell_val << 20
+                pygame.draw.rect(screen, color,
+                            [i, j, tamCuadro, tamCuadro], 0)
+                ht += 1
+            wh += 1
+        pygame.display.flip()
+        clock.tick(1)
+
+        n_it += 1 # nueva iteración
+        print(n_it)
+    pygame.quit()
     print("SUCCESS")
 
 
