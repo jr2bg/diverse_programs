@@ -49,9 +49,10 @@ def PeanoCurve(n_iter):
     return chain
 
 if __name__ == "__main__":
-    turtle.shape("turtle")
-    turtle.speed(10)
+    turtle.hideturtle()
+    turtle.speed(0)
     turtle.setheading(90)
+    turtle.tracer(0,0)
 
     turtle.color('green', 'yellow')
 
@@ -60,9 +61,9 @@ if __name__ == "__main__":
     for chr in chain:
         if chr == "F":
             turtle.forward(5)
-        elif chr == "-":
+        elif chr == "−":
             turtle.left(90)
         elif chr == "+":
             turtle.right(90)
-
+    turtle.update()
     turtle.done()
