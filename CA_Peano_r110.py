@@ -97,7 +97,7 @@ def graphics(chain):
             turtle.pencolor("black")
             turtle.forward(10)
         if chr == "M":
-            turtle.pencolor("gray")
+            turtle.pencolor("red")
             turtle.forward(10)
         elif chr == "−":
             turtle.left(90)
@@ -123,6 +123,6 @@ if __name__ == "__main__":
         list_states = [transitionFunctionRule110(get_ngbhood(list_states,x)) for x in range(d_CA)]
         CA_chain = get_CA_chain(chain, list_states)
         graphics(CA_chain)
-        time.sleep(0.01)
+        time.sleep(0.5)
 
     turtle.done()
