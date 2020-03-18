@@ -123,6 +123,10 @@ if __name__ == "__main__":
         list_states = [transitionFunctionRule110(get_ngbhood(list_states,x)) for x in range(d_CA)]
         CA_chain = get_CA_chain(chain, list_states)
         graphics(CA_chain)
+<<<<<<< HEAD
         time.sleep(0.5)
+=======
+        time.sleep(1)
+>>>>>>> c97b63fc2ed9d5e3b7fb1e6434d2445628197238
 
     turtle.done()
