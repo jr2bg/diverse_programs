@@ -1,22 +1,43 @@
+import argparse
 import matplotlib.pyplot as plt
 
+# python lotka_volterra.py -h_s 0.1 -N 1000 -m 2 -a 1.1 -b 0.4 -g 0.1 -d 0.4
+
+ap = argparse.ArgumentParser()
+ap.add_argument("-h_s", "--time_step", required = True,
+                help= "time step for the function", type = float)
+ap.add_argument("-N", "--number_steps", required = True,
+                help= "number of steps for the function", type = int)
+ap.add_argument("-m", "--max_functions", required = True,
+                help= "number of equations in the system", type = int)
+ap.add_argument("-a", "--alpha", required = True,
+                help= "first parameter in the LVs", type = float)
+ap.add_argument("-b", "--beta", required = True,
+                help= "secont parameter in the LVs", type = float)
+ap.add_argument("-g", "--gamma", required = True,
+                help= "third parameter in the LVs", type = float)
+ap.add_argument("-d", "--delta", required = True,
+                help= "fourth parameter in the LVs", type = float)
+
+
+args = vars(ap.parse_args())
 # paso
-h = 0.1
+h = args["time_step"]
 
 # número de pasos
-N = 1000
+N = args["number_steps"]
 
 # número máximo de argumentos para las funciones, y funciones
-m = 2
+m = args["max_functions"]
 
 # inicialización del diccionario de argumentos
 keys_arg = ["w_{}".format(i) for i in range(1, m + 1)]
 
 # parámetros de Lotka-Volterra
-alpha = 1.1
-beta = 0.4
-gamma = 0.1
-delta = 0.4
+alpha = args["alpha"]
+beta = args["beta"]
+gamma = args["gamma"]
+delta = args["delta"]
 
 # funciones de Lotka-Volterra
 def f_1(t_j, **kwargs):
